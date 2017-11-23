@@ -47,12 +47,12 @@ int main(int argc, char** argv)
 	namedWindow("Reconocimiento");
 	namedWindow("Fondo");
 
-        // creamos el objeto para la substracción de fondo
-	
+    // creamos el objeto para la substracción de fondo
+	MyBGSubtractorColor bg_color(cap);
 	// creamos el objeto para el reconocimiento de gestos
 
 	// iniciamos el proceso de obtención del modelo del fondo
-	
+	bg_color.LearnModel();
 
 	for (;;)
 	{
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 		if ((char)c == 'q') break;
 
 		// obtenemos la máscara del fondo con el frame actual
-                
+                bg_color.ObtainBGMask(frame, bgmask);
                 // CODIGO 2.1
                 // limpiar la máscara del fondo de ruido
                 //...
@@ -80,6 +80,7 @@ int main(int argc, char** argv)
                 // mostramos el resultado del reconocimento de gestos
 
 		imshow("Reconocimiento", frame);
+		imshow("Fondo", bgmask);
 
 		
 	}

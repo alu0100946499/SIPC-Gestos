@@ -100,10 +100,25 @@ void MyBGSubtractorColor::LearnModel() {
         // Obtener las regiones de interés y calcular la media de cada una de ellas
         // almacenar las medias en la variable means
         // ...
-	
+		cvtColor(frame,hls_frame,CVBGR2GHLS);
+		for (int i=0; i< max_samples;i++){
+			Mat roi = hls_frame(Rect(samples_positions[i].x,samples_positions[i].y,SAMPLE_SIZE,SAMPLE_SIZE));
+			means[i]=mean(roi);
+		}
+
+		//
         destroyWindow("Cubre los cuadrados con la mano y pulsa espacio");
 
 }
+
+int MyBGSubtractorColor::max(int a, int b){
+	return a>b?a:b;
+}
+int MyBGSubtractorColor::min(int a, int b){
+	return a<b?a:b;
+}
+
+
 void  MyBGSubtractorColor::ObtainBGMask(cv::Mat frame, cv::Mat &bgmask) {
         
         // CODIGO 1.2
@@ -111,5 +126,27 @@ void  MyBGSubtractorColor::ObtainBGMask(cv::Mat frame, cv::Mat &bgmask) {
         // umbralizar las imágenes para cada rango y sumarlas para
         // obtener la máscara final con el fondo eliminado
         //...
-	
+		cv::Mat hls_frame;
+		cvtColor(frame,hls_frame,CVBGR2GHLS);
+
+		cv::Mat acc(frame.rows, frame.cols, CV_8UC1, Scalar(0));
+		cv::Mat tem;
+
+		for(int i =0; i<means.size();i++){
+
+			lower_bounds[i][0]= max((means[i][0]-h_low),0);
+			upper_bounds[i][0]= min((means[i][0]+h_up),255);
+			lower_bounds[i][1]= max((means[i][1]-s_low),0);
+			upper_bounds[i][1]= min((means[i][1]+s_up),255);
+			lower_bounds[i][2]= max((means[i][2]-l_low),0);
+			upper_bounds[i][2]= min((means[i][2]+l_up),255);
+
+			inrange(hls_frame[0],lower_bounds[i],upper_bounds[i],tem);
+			acc+=tem;
+		}
+		acc.copyTo(bgmask);
+
+
+
+
 }

@@ -20,6 +20,8 @@ public:
 	MyBGSubtractorColor(cv::VideoCapture vc);
 	void LearnModel();
 	void ObtainBGMask(cv::Mat frame, cv::Mat &bgmask);
+	int max(int a,int b);
+	int min(int a,int b);
 	
 
 private:
